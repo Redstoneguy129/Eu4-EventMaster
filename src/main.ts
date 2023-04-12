@@ -12,7 +12,9 @@ import CommandType from "./types/CommandType";
 const commands: CommandType[] = [];
 
 const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.ts'));
+const commandFiles = fs.readdirSync(commandsPath).filter(file => {
+    return file.endsWith('.js' || '.ts');
+})
 
 for(const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -46,4 +48,4 @@ client.on(Events.InteractionCreate, async interaction => {
     })
 })
 
-client.login(config.DISCORD_TOKEN).then(console.log);
+client.login(config.DISCORD_TOKEN).then(() => console.log("Logged in!"));
