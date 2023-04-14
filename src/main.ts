@@ -1,14 +1,22 @@
 import * as dotenv from "dotenv";
 
+dotenv.config();
+
 type ConfigType = {
-    DISCORD_TOKEN: string,
-    POSTGRES_USERNAME: string,
-    POSTGRES_PASSWORD: string,
-    POSTGRES_URL: string,
-    POSTGRES_DB: string
+    DISCORD_TOKEN: string | undefined,
+    POSTGRES_USERNAME: string | undefined,
+    POSTGRES_PASSWORD: string | undefined,
+    POSTGRES_URL: string | undefined,
+    POSTGRES_DB: string | undefined
 }
 
-export const config: ConfigType = <ConfigType>dotenv.config().parsed;
+export const config: ConfigType = {
+    DISCORD_TOKEN: process.env.DISCORD_TOKEN,
+    POSTGRES_USERNAME: process.env.POSTGRES_USERNAME,
+    POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
+    POSTGRES_URL: process.env.POSTGRES_URL,
+    POSTGRES_DB: process.env.POSTGRES_DB
+}
 
 import { Client, Events, GatewayIntentBits, Routes } from "discord.js";
 
@@ -16,6 +24,7 @@ import * as fs from "fs";
 import * as path from "path";
 import CommandType from "./types/CommandType";
 import {CampaignModel, database} from "./database";
+import * as process from "process";
 
 const commands: CommandType[] = [];
 
