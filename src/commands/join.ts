@@ -16,7 +16,6 @@ const command = new SlashCommandBuilder()
     .setDescription("Join an ongoing campaign");
 
 async function guildCommand(guild: string): Promise<SlashCommandBuilder> {
-    console.log(`Creating join command for guild ${guild}.`);
     const campaigns = await CampaignModel.findAll({ where: { guildId: guild } });
     if(campaigns.length === 0) {
         await command.addChannelOption(option => option.setName("campaign").setDescription("The campaign you want to join").addChannelTypes(ChannelType.GuildCategory).setRequired(true));
@@ -29,7 +28,6 @@ async function guildCommand(guild: string): Promise<SlashCommandBuilder> {
         });
         return option;
     });
-    console.log(JSON.stringify(command.toJSON()));
     return command;
 }
 
@@ -40,10 +38,8 @@ async function execute(interaction: ChatInputCommandInteraction) {
     const camp = interaction.options.get("campaign");
     let campaignCategory: CategoryChannel;
     if(camp?.type === 3) {
-        console.log("Using string option");
         campaignCategory = <CategoryChannel>guild.channels.resolve((await CampaignModel.findOne({ where: { id: <string>camp.value } }))?.getDataValue("categoryId"));
     } else {
-        console.log("Using channel option");
         campaignCategory = <CategoryChannel>interaction.options.getChannel('campaign');
     }
     const campaign = await CampaignModel.findOne({ where: { categoryId: campaignCategory.id.toString() } });
