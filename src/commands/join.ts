@@ -24,7 +24,7 @@ async function guildCommand(guild: string): Promise<SlashCommandBuilder> {
     await command.addStringOption(option => {
         option.setName("campaign").setDescription("The campaign you want to join").setRequired(true);
         campaigns.forEach(campaign => {
-            option.addChoices({ name: campaign.getDataValue("name"), value: campaign.getDataValue("id") });
+            option.setChoices({ name: campaign.getDataValue("name"), value: campaign.getDataValue("id") });
         });
         return option;
     });
