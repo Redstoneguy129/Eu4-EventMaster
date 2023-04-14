@@ -1,5 +1,5 @@
-import { Sequelize, DataTypes } from "sequelize";
-import { config } from "./main";
+import {DataTypes, Sequelize} from "sequelize";
+import {config} from "./main";
 
 function getDatabase() {
     const postgres = new Sequelize({

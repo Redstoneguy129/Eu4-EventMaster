@@ -1,10 +1,12 @@
 import {
-    SlashCommandBuilder,
-    PermissionFlagsBits,
-    ChatInputCommandInteraction,
-    ChannelType,
     CategoryChannel,
-    Guild, Channel, GuildTextBasedChannel, GuildMember, Snowflake
+    ChannelType,
+    ChatInputCommandInteraction,
+    Guild,
+    GuildMember,
+    GuildTextBasedChannel,
+    PermissionFlagsBits,
+    SlashCommandBuilder
 } from "discord.js";
 import {CampaignModel} from "../database";
 
@@ -48,7 +50,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
     await category.children.cache.each(async ch => await ch.delete(`Ended the ${campaign.getDataValue("name")} Campaign`));
 
     await category.delete(`Ended the ${campaign.getDataValue("name")} Campaign`);
-    
+
     await guild.roles.delete(campaign.getDataValue("roleId"));
 
     await campaign.destroy();

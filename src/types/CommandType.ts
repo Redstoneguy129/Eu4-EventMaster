@@ -1,8 +1,13 @@
-import type {SlashCommandBuilder, ChatInputCommandInteraction} from "discord.js";
+import type {
+    ChatInputCommandInteraction,
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    SlashCommandBuilder
+} from "discord.js";
 
 type Command = {
     command: SlashCommandBuilder,
-    execute(interaction: ChatInputCommandInteraction): Promise<void>
+    guildCommand?(guild: string): Promise<SlashCommandBuilder>,
+    execute(interaction: ChatInputCommandInteraction): Promise<void>,
 }
 
 export default Command;

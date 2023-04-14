@@ -1,9 +1,11 @@
 import {
-    SlashCommandBuilder,
-    PermissionFlagsBits,
-    ChatInputCommandInteraction,
     ChannelType,
-    PermissionOverwrites, PermissionsBitField, Channel, Guild, GuildMember
+    ChatInputCommandInteraction,
+    Guild,
+    GuildMember,
+    PermissionFlagsBits,
+    PermissionsBitField,
+    SlashCommandBuilder
 } from "discord.js";
 import EventChannelType from "../types/EventChannelType";
 import {CampaignModel} from "../database";

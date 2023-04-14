@@ -2,8 +2,8 @@ import {
     CategoryChannel,
     ChannelType,
     ChatInputCommandInteraction,
-    Guild,
-    GuildMember, GuildTextBasedChannel,
+    GuildMember,
+    GuildTextBasedChannel,
     PermissionFlagsBits,
     SlashCommandBuilder
 } from "discord.js";
