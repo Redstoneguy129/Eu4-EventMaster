@@ -43,10 +43,12 @@ export async function regenCampaignGuildCommands(guildId: string, applicationId:
     const guildCommands = commands.filter(cmd => cmd.guildCommand);
     // @ts-ignore
     const guildCommandJSON = (await Promise.all(guildCommands.map(async oldCMD => (await oldCMD.guildCommand(guildId)).toJSON()))).flat();
-    await guildCommandJSON.forEach(cmd => {
-        // @ts-ignore
-        client.guilds.resolve(guildId)?.commands.cache.find(cmdd => cmdd.name === cmd.name).delete();
-    });
+    for (const guildCommandJSONElement of guildCommandJSON) {
+        //@ts-ignore
+        const capp = client.application;
+        const oldcmd = capp!.commands.cache.find(cmdd => cmdd.name === guildCommandJSONElement.name);
+        await restClient.delete(Routes.applicationGuildCommand(applicationId, guildId, oldcmd?.id!));
+    }
     const guildData: number = <number>await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), {body: guildCommandJSON});
     // @ts-ignore
     console.log(`Successfully reloaded ${guildData.length} guild commands for ${guildId}.`);
