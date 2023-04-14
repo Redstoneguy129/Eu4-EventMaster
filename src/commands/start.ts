@@ -4,7 +4,7 @@ import {
     Guild,
     GuildMember,
     PermissionFlagsBits,
-    PermissionsBitField,
+    PermissionsBitField, Routes,
     SlashCommandBuilder
 } from "discord.js";
 import EventChannelType from "../types/EventChannelType";
@@ -75,7 +75,16 @@ async function execute(interaction: ChatInputCommandInteraction) {
 
     await interaction.editReply(`Created campaign ${campaignName}`);
 
-    await regenCampaignGuildCommands(guild.id, interaction.applicationId, interaction.client.rest);
+    /*
+
+    await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), { body: [] }).then(async () => {
+
+    });
+     */
+
+    await interaction.client.rest.put(Routes.applicationGuildCommands(interaction.applicationId, guild.id), { body: [] }).then(async () => {
+        await regenCampaignGuildCommands(guild.id, interaction.applicationId, interaction.client.rest);
+    });
 }
 
 export {
