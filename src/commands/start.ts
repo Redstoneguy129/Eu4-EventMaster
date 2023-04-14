@@ -3,21 +3,75 @@ import {
     PermissionFlagsBits,
     ChatInputCommandInteraction,
     ChannelType,
-    PermissionOverwrites, PermissionsBitField
+    PermissionOverwrites, PermissionsBitField, Channel, Guild, GuildMember
 } from "discord.js";
 import EventChannelType from "../types/EventChannelType";
-import eventChannelType from "../types/EventChannelType";
+import {CampaignModel} from "../database";
 
 const command = new SlashCommandBuilder()
     .setName("start")
     .setDescription("Start a new campaign")
-    .addStringOption(opt => opt.setName("name").setDescription("Name of campaign").setRequired(true))
+    .addStringOption(opt => opt.setName("name").setDescription("Name of campaign").setRequired(true).setMinLength(8).setMaxLength(15))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageEvents);
 
 async function execute(interaction: ChatInputCommandInteraction) {
     const campaignName: string = <string>interaction.options.getString('name');
-    await interaction.reply(`Starting game ${campaignName}`)
+    await interaction.deferReply();
+    const guild: Guild = <Guild>interaction.guild;
+    const managerMember: GuildMember = <GuildMember>interaction.member;
+    const reason = `Created for campaign ${campaignName}`;
+
+    const role = await guild.roles.create({
+        name: campaignName.toLowerCase(),
+        mentionable: true,
+        permissions: [],
+        reason
+    });
+
+    await managerMember.roles.add(role);
+
+    const category = await guild.channels.create({
+        name: campaignName.toLowerCase(),
+        type: ChannelType.GuildCategory,
+        permissionOverwrites: [
+            { id: role.id, allow: [PermissionsBitField.Flags.ViewChannel] },
+            { id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] }
+        ],
+        reason
+    });
+
+    await CampaignModel.create({
+        id: Date.now().toString(),
+        name: campaignName,
+        ownerId: interaction.user.id,
+        guildId: guild.id,
+        categoryId: category.id,
+        roleId: role.id
+    });
+
     const channels: EventChannelType[] = [
+        { name: "server-id", type: ChannelType.GuildAnnouncement, perms: [{id: guild.id, deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ViewChannel]}, {id: role.id, allow: [PermissionsBitField.Flags.ViewChannel]}, {id: managerMember.id, allow: [PermissionsBitField.Flags.SendMessages]}] },
+        { name: "save-fixes", type: ChannelType.GuildForum },
+        { name: "general", type: ChannelType.GuildText },
+        { name: "NorthAmerica", type: ChannelType.GuildVoice },
+        { name: "SouthAmerica", type: ChannelType.GuildVoice },
+        { name: "WestEurope", type: ChannelType.GuildVoice },
+        { name: "HolyRomanEmpire", type: ChannelType.GuildVoice },
+        { name: "EastEurope", type: ChannelType.GuildVoice },
+        { name: "NorthAfrica", type: ChannelType.GuildVoice },
+        { name: "Africa", type: ChannelType.GuildVoice },
+        { name: "MiddleEast", type: ChannelType.GuildVoice },
+        { name: "India", type: ChannelType.GuildVoice },
+        { name: "SouthEastAsia", type: ChannelType.GuildVoice },
+        { name: "Asia", type: ChannelType.GuildVoice },
+    ]
+
+    for (const eventChannelType of channels) {
+        await guild.channels.create({ name: eventChannelType.name, type: eventChannelType.type, parent: category, permissionOverwrites: eventChannelType.perms });
+    }
+
+    await interaction.editReply(`Created campaign ${campaignName}`);
+    /*const channels: EventChannelType[] = [
         // @ts-ignore
         { name: "server-id", type: ChannelType.GuildAnnouncement, perms: [{id: interaction.guild.id, deny: [PermissionsBitField.Flags.SendMessages]}, {id: interaction.guild.roles.cache.find(r => r.name.toLowerCase() === "managers").id, allow: [PermissionsBitField.Flags.SendMessages]}] },
         { name: "save-fixes", type: ChannelType.GuildForum },
@@ -43,6 +97,7 @@ async function execute(interaction: ChatInputCommandInteraction) {
         // @ts-ignore
         await interaction.guild.channels.create({ name: eventChannelType.name, type: eventChannelType.type, parent: category, permissionOverwrites: eventChannelType.perms });
     }
+    */
 }
 
 export {
