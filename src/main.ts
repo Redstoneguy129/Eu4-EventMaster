@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import * as process from "process";
 
 dotenv.config();
 
@@ -24,7 +25,6 @@ import * as fs from "fs";
 import * as path from "path";
 import CommandType from "./types/CommandType";
 import {CampaignModel, database} from "./database";
-import * as process from "process";
 
 const commands: CommandType[] = [];
 
