@@ -46,7 +46,7 @@ export async function regenCampaignGuildCommands(guildId: string, applicationId:
     for (const guildCommandJSONElement of guildCommandJSON) {
         //@ts-ignore
         const capp = client.application;
-        const oldcmd = capp!.commands.cache.find(cmdd => cmdd.name === guildCommandJSONElement.name);
+        const oldcmd = await capp!.commands.cache.find(cmdd => cmdd.name === guildCommandJSONElement.name);
         await restClient.delete(Routes.applicationGuildCommand(applicationId, guildId, oldcmd?.id!));
     }
     const guildData: number = <number>await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), {body: guildCommandJSON});
