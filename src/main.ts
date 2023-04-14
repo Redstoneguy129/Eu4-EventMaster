@@ -1,11 +1,5 @@
 import * as dotenv from "dotenv";
 import * as process from "process";
-import {Client, Events, GatewayIntentBits, Routes} from "discord.js";
-
-import * as fs from "fs";
-import * as path from "path";
-import CommandType from "./types/CommandType";
-import {CampaignModel, database} from "./database";
 
 dotenv.config();
 
@@ -24,6 +18,13 @@ export const config: ConfigType = {
     POSTGRES_URL: process.env.POSTGRES_URL,
     POSTGRES_DB: process.env.POSTGRES_DB
 }
+
+import {Client, Events, GatewayIntentBits, Routes} from "discord.js";
+
+import * as fs from "fs";
+import * as path from "path";
+import CommandType from "./types/CommandType";
+import {CampaignModel, database} from "./database";
 
 const commands: CommandType[] = [];
 
