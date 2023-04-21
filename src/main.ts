@@ -19,7 +19,7 @@ export const config: ConfigType = {
     POSTGRES_DB: process.env.POSTGRES_DB
 }
 
-import {Client, Events, GatewayIntentBits, REST, Routes} from "discord.js";
+import {Client, Events, GatewayIntentBits, REST, Routes, Guild, ApplicationCommand} from "discord.js";
 
 import * as fs from "fs";
 import * as path from "path";
@@ -39,36 +39,14 @@ for(const file of commandFiles) {
 
 export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-export async function regenCampaignGuildCommands(guildId: string, applicationId: string, restClient: REST) {
-    const guildCommands = commands.filter(cmd => cmd.guildCommand);
-    // @ts-ignore
-    const guildCommandJSON = (await Promise.all(guildCommands.map(async oldCMD => (await oldCMD.guildCommand(guildId)).toJSON()))).flat();
-    let guildData;
-
-    try {
-        guildData = <number>await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), {body: guildCommandJSON});
-    } catch (e) {
-        await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), { body: [] });
-        guildData = <number>await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), {body: guildCommandJSON});
-    }
-
-    // @ts-ignore
-    console.log(`Successfully reloaded ${guildData.length} guild commands for ${guildId}.`);
-}
-
 client.once(Events.ClientReady, async event => {
     await database.authenticate();
     await CampaignModel.sync();
     console.log(`Logged in as ${event.user.tag}!`);
     const rest = client.rest;
     console.log(`Started refreshing ${commands.length} application commands.`);
-    const nonGuildCommands = commands.filter(cmd => !cmd.guildCommand);
-    const commandJSON = nonGuildCommands.flatMap(oldCMD => oldCMD.command.toJSON());
+    const commandJSON = commands.flatMap(oldCMD => oldCMD.command.toJSON());
     let data: number = <number>await rest.put(Routes.applicationCommands(event.application.id), {body: commandJSON});
-
-    await event.guilds.cache.each(async guild => {
-        await regenCampaignGuildCommands(guild.id, event.application.id, rest);
-    });
 
     // @ts-ignore
     console.log(`Successfully reloaded ${data.length} application commands.`);

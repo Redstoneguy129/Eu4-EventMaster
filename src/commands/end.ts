@@ -9,7 +9,6 @@ import {
     SlashCommandBuilder
 } from "discord.js";
 import {CampaignModel} from "../database";
-import {regenCampaignGuildCommands} from "../main";
 
 const command = new SlashCommandBuilder()
     .setName("end")
@@ -55,10 +54,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
     await guild.roles.delete(campaign.getDataValue("roleId"));
 
     await campaign.destroy();
-
-    await interaction.client.rest.put(Routes.applicationGuildCommands(interaction.applicationId, guild.id), { body: [] }).then(async () => {
-        await regenCampaignGuildCommands(guild.id, interaction.applicationId, interaction.client.rest);
-    });
 }
 
 export {

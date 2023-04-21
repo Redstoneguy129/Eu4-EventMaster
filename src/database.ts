@@ -2,7 +2,14 @@ import {DataTypes, Sequelize} from "sequelize";
 import {config} from "./main";
 
 function getDatabase() {
-    const postgres = new Sequelize({
+    if(config.POSTGRES_URL === undefined) {
+        return new Sequelize({
+            dialect: 'sqlite',
+            storage: 'campaigns.sqlite',
+            logging: false
+        });
+    }
+    return new Sequelize({
         dialect: 'postgres',
         host: config.POSTGRES_URL,
         username: config.POSTGRES_USERNAME,
@@ -11,15 +18,6 @@ function getDatabase() {
         port: 5432,
         logging: false
     });
-    const sqlite3 = new Sequelize({
-        dialect: 'sqlite',
-        storage: 'campaigns.sqlite',
-        logging: false
-    });
-    if(config.POSTGRES_URL === undefined) {
-        return sqlite3;
-    }
-    return postgres;
 }
 
 let db = getDatabase();
@@ -52,4 +50,4 @@ export const CampaignModel = database.define('campaign', {
         type: DataTypes.TEXT,
         allowNull: false
     }
-})
+});

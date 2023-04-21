@@ -6,7 +6,6 @@ import type {
 
 type Command = {
     command: SlashCommandBuilder,
-    guildCommand?(guild: string): Promise<SlashCommandBuilder>,
     execute(interaction: ChatInputCommandInteraction): Promise<void>,
 }
 

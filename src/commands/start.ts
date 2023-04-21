@@ -4,12 +4,11 @@ import {
     Guild,
     GuildMember,
     PermissionFlagsBits,
-    PermissionsBitField, Routes,
+    PermissionsBitField,
     SlashCommandBuilder
 } from "discord.js";
 import EventChannelType from "../types/EventChannelType";
 import {CampaignModel} from "../database";
-import {regenCampaignGuildCommands} from "../main";
 
 const command = new SlashCommandBuilder()
     .setName("start")
@@ -36,10 +35,6 @@ async function execute(interaction: ChatInputCommandInteraction) {
     const category = await guild.channels.create({
         name: campaignName.toLowerCase(),
         type: ChannelType.GuildCategory,
-        permissionOverwrites: [
-            { id: role.id, allow: [PermissionsBitField.Flags.ViewChannel] },
-            { id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] }
-        ],
         reason
     });
 
@@ -70,21 +65,12 @@ async function execute(interaction: ChatInputCommandInteraction) {
     ]
 
     for (const eventChannelType of channels) {
+        if(eventChannelType.perms === undefined) eventChannelType.perms = []
+        eventChannelType.perms.push({ id: role.id, allow: [PermissionsBitField.Flags.ViewChannel] }, { id: guild.id, deny: [PermissionsBitField.Flags.ViewChannel] })
         await guild.channels.create({ name: eventChannelType.name, type: eventChannelType.type, parent: category, permissionOverwrites: eventChannelType.perms });
     }
 
     await interaction.editReply(`Created campaign ${campaignName}`);
-
-    /*
-
-    await restClient.put(Routes.applicationGuildCommands(applicationId, guildId), { body: [] }).then(async () => {
-
-    });
-     */
-
-    await interaction.client.rest.put(Routes.applicationGuildCommands(interaction.applicationId, guild.id), { body: [] }).then(async () => {
-        await regenCampaignGuildCommands(guild.id, interaction.applicationId, interaction.client.rest);
-    });
 }
 
 export {
